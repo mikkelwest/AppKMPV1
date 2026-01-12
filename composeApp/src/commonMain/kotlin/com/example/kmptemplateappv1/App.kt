@@ -18,12 +18,21 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import kmptemplateappv1.composeapp.generated.resources.Res
 import kmptemplateappv1.composeapp.generated.resources.compose_multiplatform
+import kotlinx.coroutines.launch
+import networking.createPlatformHttpClient
+import networking.SecApi
+import networking.tokenStore
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
+        var status by remember { mutableStateOf<String?>(null) }
+        val coroutineScope = rememberCoroutineScope()
+        // Create clients once per composition
+        val client = remember { createPlatformHttpClient() }
+        val api = remember { SecApi(client, "https://sec.sdlab.dk") }
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.primaryContainer)
@@ -33,6 +42,35 @@ fun App() {
         ) {
             Button(onClick = { showContent = !showContent }) {
                 Text("Click me!")
+            }
+            Button(onClick = {
+                status = "Logging in..."
+                coroutineScope.launch {
+                    try {
+                        val res = api.login("mikkelwestnielsen@gmail.com", "33129119")
+                        status = if (res != null && !res.access_token.isNullOrBlank()) {
+                            "Login success"
+                        } else {
+                            "Login failed or no tokens returned"
+                        }
+                    } catch (e: Exception) {
+                        status = "Login error: ${'$'}{e.message}"
+                    }
+                }
+            }) {
+                Text("Login!")
+            }
+            Button(onClick = {
+                coroutineScope.launch {
+                    val token = tokenStore.getAccessToken()
+                    status = token ?: "No token saved"
+                }
+            }) {
+                Text("Show token")
+            }
+
+            if (status != null) {
+                Text(status!!)
             }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
