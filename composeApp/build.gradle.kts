@@ -43,6 +43,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
+            api(libs.datastore.preferences)
+            api(libs.datastore)
+
             implementation(libs.bundles.ktor)
         }
         nativeMain.dependencies {

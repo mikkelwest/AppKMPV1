@@ -13,19 +13,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import kmptemplateappv1.composeapp.generated.resources.Res
 import kmptemplateappv1.composeapp.generated.resources.compose_multiplatform
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import networking.createPlatformHttpClient
 import networking.SecApi
 import networking.tokenStore
+//import savedToken
+import kotlin.text.get
 
 @Composable
 @Preview
-fun App() {
+fun App(
+    prefs: DataStore<Preferences>
+) {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         var status by remember { mutableStateOf<String?>(null) }
@@ -33,6 +43,14 @@ fun App() {
         // Create clients once per composition
         val client = remember { createPlatformHttpClient() }
         val api = remember { SecApi(client, "https://sec.sdlab.dk") }
+        val savedToken by prefs
+            .data
+            .map {
+                val tokenKey = stringPreferencesKey("tokenKey")
+                it[tokenKey] ?: "No token saved"
+            }
+            .collectAsState("No token saved")
+
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.primaryContainer)
@@ -53,6 +71,14 @@ fun App() {
                         } else {
                             "Login failed or no tokens returned"
                         }
+                        if (res?.access_token != null) {
+                            prefs.edit { dataStore ->
+                                val counterKey = stringPreferencesKey("tokenKey")
+                                dataStore[counterKey] = res.access_token
+                            }
+                        }
+
+
                     } catch (e: Exception) {
                         status = "Login error: ${'$'}{e.message}"
                     }
@@ -62,8 +88,7 @@ fun App() {
             }
             Button(onClick = {
                 coroutineScope.launch {
-                    val token = tokenStore.getAccessToken()
-                    status = token ?: "No token saved"
+                    status = savedToken // already a String
                 }
             }) {
                 Text("Show token")
