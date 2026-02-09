@@ -1,7 +1,6 @@
-package networking
+package com.example.kmptemplateappv1.networking
 
 import io.ktor.client.HttpClient
 
 // Provides a platform-specific preconfigured HttpClient.
 expect fun createPlatformHttpClient(): HttpClient
-

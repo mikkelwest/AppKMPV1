@@ -1,14 +1,19 @@
 package com.example.kmptemplateappv1
 
+import android.graphics.drawable.Icon
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,97 +21,92 @@ import androidx.compose.ui.Modifier
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.savedstate.serialization.SavedStateConfiguration
+import com.example.kmptemplateappv1.navigation.NavigationRoot
+import com.example.kmptemplateappv1.navigation.Route
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-
-import kmptemplateappv1.composeapp.generated.resources.Res
 import kmptemplateappv1.composeapp.generated.resources.compose_multiplatform
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import networking.createPlatformHttpClient
-import networking.SecApi
-import networking.tokenStore
-//import savedToken
-import kotlin.text.get
+import com.example.kmptemplateappv1.networking.createPlatformHttpClient
+import com.example.kmptemplateappv1.networking.SecApi
+import com.example.kmptemplateappv1.screens.TodoListScreen
+import com.example.kmptemplateappv1.theme.AppTheme
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 
+//import savedToken
+
+
+data class BottomNavItem(
+    val title: String,
+    val route: NavKey
+)
 @Composable
 @Preview
 fun App(
     prefs: DataStore<Preferences>
 ) {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        var status by remember { mutableStateOf<String?>(null) }
-        val coroutineScope = rememberCoroutineScope()
-        // Create clients once per composition
-        val client = remember { createPlatformHttpClient() }
-        val api = remember { SecApi(client, "https://sec.sdlab.dk") }
-        val savedToken by prefs
-            .data
-            .map {
-                val tokenKey = stringPreferencesKey("tokenKey")
-                it[tokenKey] ?: "No token saved"
-            }
-            .collectAsState("No token saved")
 
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+
+    val backStack: NavBackStack<NavKey> = rememberNavBackStack(
+        configuration = SavedStateConfiguration {
+            serializersModule = SerializersModule {
+                polymorphic(NavKey::class) {
+                    subclass(Route.TodoList::class, Route.TodoList.serializer())
+                    subclass(Route.TodoDetails::class, Route.TodoDetails.serializer())
+                    subclass(Route.ToLogin::class, Route.ToLogin.serializer())
+                }
             }
-            Button(onClick = {
-                status = "Logging in..."
-                coroutineScope.launch {
-                    try {
-                        val res = api.login("mikkelwestnielsen@gmail.com", "33129119")
-                        status = if (res != null && !res.access_token.isNullOrBlank()) {
-                            "Login success"
-                        } else {
-                            "Login failed or no tokens returned"
-                        }
-                        if (res?.access_token != null) {
-                            prefs.edit { dataStore ->
-                                val counterKey = stringPreferencesKey("tokenKey")
-                                dataStore[counterKey] = res.access_token
+        },
+        Route.TodoList
+    )
+
+    val item = listOf(
+        BottomNavItem(
+            title = "Groups",
+            route = Route.ToGroupList
+
+        ),
+        BottomNavItem(
+            title = "Control",
+            route = Route.ToControl
+        ),
+        BottomNavItem(
+            title = "Profile",
+            route = Route.ToProfile
+        )
+    )
+
+    AppTheme {
+
+        Scaffold(
+            bottomBar = {
+                NavigationBar {
+                    item.forEach { navItem ->
+                        NavigationBarItem(
+                            icon = { Text( navItem.title) }, // simple placeholder icon
+                            selected = false,
+                            onClick = {
+                                backStack.add(navItem.route)
                             }
-                        }
-
-
-                    } catch (e: Exception) {
-                        status = "Login error: ${'$'}{e.message}"
+                        )
                     }
                 }
-            }) {
-                Text("Login!")
             }
-            Button(onClick = {
-                coroutineScope.launch {
-                    status = savedToken // already a String
-                }
-            }) {
-                Text("Show token")
-            }
-
-            if (status != null) {
-                Text(status!!)
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
+        ){
+            innerPadding ->
+            NavigationRoot(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .safeContentPadding(),
+                backStack = backStack
+            )
         }
     }
 }

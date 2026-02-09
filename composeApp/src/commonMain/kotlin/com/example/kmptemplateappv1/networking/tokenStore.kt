@@ -1,4 +1,4 @@
-package networking
+package com.example.kmptemplateappv1.networking
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
