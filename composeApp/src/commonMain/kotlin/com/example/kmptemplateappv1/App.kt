@@ -1,6 +1,6 @@
 package com.example.kmptemplateappv1
 
-import android.graphics.drawable.Icon
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +33,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kmptemplateappv1.composeapp.generated.resources.compose_multiplatform
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import com.example.kmptemplateappv1.networking.createPlatformHttpClient
+
 import com.example.kmptemplateappv1.networking.SecApi
 import com.example.kmptemplateappv1.screens.TodoListScreen
 import com.example.kmptemplateappv1.theme.AppTheme
@@ -52,7 +52,14 @@ data class BottomNavItem(
 fun App(
     prefs: DataStore<Preferences>
 ) {
-
+    val scope = rememberCoroutineScope()
+    val savedToken by prefs
+        .data
+        .map {
+            val tokenKey = stringPreferencesKey("auth_token")
+            it[tokenKey] ?: "No token saved"
+        }
+        .collectAsState("No token saved")
 
     val backStack: NavBackStack<NavKey> = rememberNavBackStack(
         configuration = SavedStateConfiguration {
@@ -66,6 +73,20 @@ fun App(
         },
         Route.TodoList
     )
+
+    // Navigate to login if no token
+    LaunchedEffect(savedToken) {
+        if (savedToken == "No token saved") {
+            backStack.add(Route.ToLogin)
+        } else {
+            // Optionally, you could validate the token here before navigating to the main content
+            backStack.add(Route.TodoList)
+        }
+    }
+
+    // Rest of your code...
+
+
 
     val item = listOf(
         BottomNavItem(
@@ -105,7 +126,8 @@ fun App(
                 modifier = Modifier
                     .padding(innerPadding)
                     .safeContentPadding(),
-                backStack = backStack
+                backStack = backStack,
+                prefs = prefs
             )
         }
     }

@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -18,10 +17,8 @@ kotlin {
         }
     }
 
-    // OpenAPI generated Kotlin (Ktor) client will be added to commonMain
-
-/*
     listOf(
+        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -30,7 +27,8 @@ kotlin {
             isStatic = true
         }
     }
-*/
+
+    // OpenAPI generated Kotlin (Ktor) client will be added to commonMain
 
 
     sourceSets {
@@ -64,20 +62,11 @@ kotlin {
 
             implementation(libs.bundles.ktor)
         }
-        iosArm64Main.dependencies {
-            implementation(libs.ktor.client.darwin)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-        }
-
-        nativeMain.dependencies {
+        iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
-        }
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
         }
     }
 }

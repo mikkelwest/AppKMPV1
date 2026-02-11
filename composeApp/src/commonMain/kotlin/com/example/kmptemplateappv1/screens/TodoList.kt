@@ -1,6 +1,6 @@
 package com.example.kmptemplateappv1.screens
 
-import android.R.attr.text
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

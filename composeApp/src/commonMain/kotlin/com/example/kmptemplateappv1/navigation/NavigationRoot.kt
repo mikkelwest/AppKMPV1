@@ -12,17 +12,20 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.example.kmptemplateappv1.screens.Control
 import com.example.kmptemplateappv1.screens.GroupList
-import com.example.kmptemplateappv1.screens.LoginScreen
+import com.example.kmptemplateappv1.screens.Login
 import com.example.kmptemplateappv1.screens.Profile
 import com.example.kmptemplateappv1.screens.TodoDetailScreen
 import com.example.kmptemplateappv1.screens.TodoListScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 
 @Composable
 fun NavigationRoot(
     modifier: Modifier = Modifier,
-    backStack: NavBackStack<NavKey>
+    backStack: NavBackStack<NavKey>,
+    prefs: DataStore<Preferences>
 ) {
 
     NavDisplay(
@@ -57,21 +60,7 @@ fun NavigationRoot(
                     }
                 }
 
-                is Route.TodoDetails -> {
-                    NavEntry(key) {
-                        LoginScreen(
 
-                        )
-                    }
-                }
-
-                is Route.ToLogin -> {
-                    NavEntry(key) {
-                        LoginScreen(
-
-                        )
-                    }
-                }
 
                 is Route.ToControl -> {
                     NavEntry(key) {
@@ -89,6 +78,12 @@ fun NavigationRoot(
                     NavEntry(key) {
                         Profile()
                     }
+                }
+
+                is Route.ToLogin -> {
+                        NavEntry(key) {
+                            Login(prefs = prefs)
+                        }
                 }
 
 
