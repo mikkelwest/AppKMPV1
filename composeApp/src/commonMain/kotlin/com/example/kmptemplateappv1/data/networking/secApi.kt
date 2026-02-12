@@ -1,5 +1,6 @@
-package com.example.kmptemplateappv1.networking
+package com.example.kmptemplateappv1.data.networking
 
+import com.example.kmptemplateappv1.data.repository.tokenStore
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

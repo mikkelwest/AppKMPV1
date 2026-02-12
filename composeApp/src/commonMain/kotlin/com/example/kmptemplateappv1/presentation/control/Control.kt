@@ -1,4 +1,4 @@
-package com.example.kmptemplateappv1.screens
+package com.example.kmptemplateappv1.presentation.control
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -1,4 +1,4 @@
-package com.example.kmptemplateappv1.networking
+package com.example.kmptemplateappv1.data.networking
 
 import io.ktor.client.HttpClient
 

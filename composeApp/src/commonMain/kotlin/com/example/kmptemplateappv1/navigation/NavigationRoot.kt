@@ -6,18 +6,16 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.savedstate.serialization.SavedStateConfiguration
-import com.example.kmptemplateappv1.screens.Control
+import com.example.kmptemplateappv1.presentation.control.Control
 import com.example.kmptemplateappv1.screens.GroupList
-import com.example.kmptemplateappv1.screens.Login
+import com.example.kmptemplateappv1.presentation.login.Login
+import com.example.kmptemplateappv1.presentation.login.LoginViewModel
 import com.example.kmptemplateappv1.screens.Profile
 import com.example.kmptemplateappv1.screens.TodoDetailScreen
 import com.example.kmptemplateappv1.screens.TodoListScreen
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
+import com.example.kmptemplateappv1.presentation.counter.CounterScreen
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 
@@ -34,58 +32,59 @@ fun NavigationRoot(
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
-
         ),
         entryProvider = { key ->
             when (key) {
-                is Route.TodoList -> {
+                is Route.TodoList ->
                     NavEntry(key) {
                         TodoListScreen(
-                            onTodoClick = {
-                                backStack.add(Route.TodoDetails(it))
-                            }
+                            onTodoClick = { backStack.add(Route.TodoDetails(it)) }
                         )
                     }
-                }
 
-                is Route.TodoDetails -> {
+                is Route.TodoDetails ->
                     NavEntry(key) {
                         TodoDetailScreen(
                             todo = key.todo,
-                            onBackClick = {
-                                backStack.add(Route.TodoList)
-                            }
-
+                            onBackClick = { backStack.last() }
                         )
                     }
-                }
 
-
-
-                is Route.ToControl -> {
+                is Route.ToControl ->
                     NavEntry(key) {
                         Control()
                     }
-                }
 
-                is Route.ToGroupList -> {
+                is Route.ToGroupList ->
                     NavEntry(key) {
                         GroupList()
                     }
-                }
 
-                is Route.ToProfile -> {
+                is Route.ToProfile ->
                     NavEntry(key) {
                         Profile()
                     }
-                }
 
-                is Route.ToLogin -> {
-                        NavEntry(key) {
-                            Login(prefs = prefs)
-                        }
-                }
+                is Route.ToCounter
+                    ->
+                    NavEntry(key) {
+                        CounterScreen()
+                    }
 
+                is Route.ToLogin ->
+                    NavEntry(key) {
+                        val vm = LoginViewModel()
+                        Login(
+                            prefs = prefs,
+                            viewModel = vm,
+                            onNavigateHome = {
+                                backStack.add(Route.ToProfile)
+                            },
+                            onNavigateRegister = {
+                                println("Navigate to Register screen")
+                            }
+                        )
+                    }
 
                 else -> error("Unknown route: $key")
             }

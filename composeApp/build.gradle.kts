@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -37,6 +38,10 @@ kotlin {
             implementation(libs.androidx.activity.compose)
 
             implementation(libs.ktor.client.okhttp)
+
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -54,7 +59,11 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel)
             implementation(libs.kotlinx.serialization.json)
 
-
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+           // implementation(libs.lifecycle.viewmodel)
+           // implementation(libs.navigation.compose)
 
 
             api(libs.datastore.preferences)
@@ -64,6 +73,7 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -118,15 +128,13 @@ openApiGenerate {
     ))
 }
 
-// Add generated sources to the commonMain source set so they are compiled
-kotlin {
-    sourceSets.matching { it.name == "commonMain" }.configureEach {
-        kotlin.srcDir(file("${buildDir.path}/generated/openapi/src/main/kotlin"))
-    }
-}
-
 // Ensure generation runs before Kotlin compilation tasks
 tasks.matching { it.name.startsWith("compileKotlin") }.configureEach {
+    dependsOn(tasks.named("openApiGenerate"))
+}
+
+// Explicitly ensure common metadata compilation depends on OpenAPI generation
+tasks.matching { it.name.contains("compileCommonMainKotlinMetadata") }.configureEach {
     dependsOn(tasks.named("openApiGenerate"))
 }
 

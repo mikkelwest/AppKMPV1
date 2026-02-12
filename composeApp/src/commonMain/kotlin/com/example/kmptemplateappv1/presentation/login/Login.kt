@@ -1,4 +1,4 @@
-package com.example.kmptemplateappv1.screens
+package com.example.kmptemplateappv1.presentation.login
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,14 +22,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.kmptemplateappv1.Greeting
-import com.example.kmptemplateappv1.networking.SecApi
-import com.example.kmptemplateappv1.networking.createPlatformHttpClient
-import com.example.kmptemplateappv1.viewmodels.LoginViewModel
 import kmptemplateappv1.composeapp.generated.resources.Res
 import kmptemplateappv1.composeapp.generated.resources.compose_multiplatform
 import kotlinx.coroutines.flow.map
@@ -35,14 +36,28 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun Login(
-    prefs: DataStore<Preferences>
+    prefs: DataStore<Preferences>,
+    viewModel: LoginViewModel,
+    onNavigateHome: () -> Unit = {},
+    onNavigateRegister: () -> Unit = {},
 ) {
+    val state by viewModel.state.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    // Observe one-off effects (navigation, toast, etc.)
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                LoginContract.Effect.NavigateToHome -> onNavigateHome()
+                LoginContract.Effect.NavigateToRegister -> onNavigateRegister()
+                is LoginContract.Effect.ShowError -> { /* could show snackbar */ }
+            }
+        }
+    }
+
+    // For demo: still show the greeting block when toggled
     var showContent by remember { mutableStateOf(false) }
-    var status by remember { mutableStateOf<String?>(null) }
-    val coroutineScope = rememberCoroutineScope()
-    // Create clients once per composition
-    val client = remember { createPlatformHttpClient() }
-    val api = remember { SecApi(client, "https://sec.sdlab.dk") }
+    // api.login("mikkelwestnielsen@gmail.com", "33129119")
     val savedToken by prefs
         .data
         .map {
@@ -51,7 +66,6 @@ fun Login(
         }
         .collectAsState("No token saved")
 
-
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primaryContainer)
@@ -59,45 +73,56 @@ fun Login(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Button(onClick = { showContent = !showContent }) {
-            Text("Click me!")
+        OutlinedTextField(
+            value = state.email,
+            onValueChange = { viewModel.onEvent(LoginContract.Event.OnEmailChanged(it)) {} },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = state.password,
+            onValueChange = { viewModel.onEvent(LoginContract.Event.OnPasswordChanged(it)) {} },
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        if (state.errorMessage != null) {
+            Text(
+                text = state.errorMessage.toString(),
+                color = MaterialTheme.colorScheme.error
+            )
         }
-        Button(onClick = {
-            status = "Logging in..."
-            coroutineScope.launch {
-                try {
-                    val res = api.login("mikkelwestnielsen@gmail.com", "33129119")
-                    status = if (res != null && !res.access_token.isNullOrBlank()) {
-                        "Login success"
-                    } else {
-                        "Login failed or no tokens returned"
-                    }
-                    if (res?.access_token != null) {
+
+        Button(
+            onClick = {
+                viewModel.onEvent(LoginContract.Event.OnLoginClicked) { token ->
+                    scope.launch {
                         prefs.edit { dataStore ->
-                            val counterKey = stringPreferencesKey("auth_token")
-                            dataStore[counterKey] = res.access_token
+                            val key = stringPreferencesKey("auth_token")
+                            dataStore[key] = token
                         }
                     }
-
-
-                } catch (e: Exception) {
-                    status = "Login error: ${'$'}{e.message}"
                 }
+            },
+            enabled = !state.isLoading
+        ) {
+            if (state.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Text("Login")
             }
-        }) {
-            Text("Login!")
-        }
-        Button(onClick = {
-            coroutineScope.launch {
-                status = savedToken // already a String
-            }
-        }) {
-            Text("Show token")
         }
 
-        if (status != null) {
-            Text(status!!)
+        Button(onClick = { showContent = !showContent }) {
+            Text("Toggle greeting")
         }
+
+        Button(onClick = { /* Show stored token for debug */ }) {
+            Text(savedToken)
+        }
+
         AnimatedVisibility(showContent) {
             val greeting = remember { Greeting().greet() }
             Column(

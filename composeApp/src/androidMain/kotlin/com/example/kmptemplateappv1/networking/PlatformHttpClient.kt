@@ -1,4 +1,4 @@
-package com.example.kmptemplateappv1.networking
+package com.example.kmptemplateappv1.data.networking
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -17,4 +17,3 @@ actual fun createPlatformHttpClient(): HttpClient = HttpClient(OkHttp) {
         json(Json { ignoreUnknownKeys = true; isLenient = true })
     }
 }
-

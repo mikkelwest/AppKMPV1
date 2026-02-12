@@ -24,5 +24,8 @@ sealed interface Route: NavKey {
     @Serializable
     data object ToGroupList : Route, NavKey
 
+    @Serializable
+    data object ToCounter : Route, NavKey
+
 
 }
