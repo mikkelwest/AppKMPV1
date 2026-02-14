@@ -16,21 +16,20 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.example.kmptemplateappv1.data.dependencies.MyRepository
+import com.example.kmptemplateappv1.data.networking.ApiResult
+import com.example.kmptemplateappv1.data.networking.ApiService
+import com.example.kmptemplateappv1.data.networking.PostAssetIntValueRequest
+import com.example.kmptemplateappv1.data.networking.createPlatformHttpClient
 import com.example.kmptemplateappv1.navigation.NavigationRoot
 import com.example.kmptemplateappv1.navigation.Route
-import com.example.kmptemplateappv1.presentation.login.LoginViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.map
 
 import com.example.kmptemplateappv1.theme.AppTheme
+import httpClient
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.KoinContext
-import org.koin.compose.koinInject
-import org.koin.core.context.KoinContext
-
-//import savedToken
 
 
 data class BottomNavItem(
@@ -42,9 +41,42 @@ data class BottomNavItem(
 fun App(
     prefs: DataStore<Preferences>
 ) {
-    KoinContext() {
+    val httpClient = remember { createPlatformHttpClient() }
+    val apiService = remember { ApiService(httpClient, "https://poset-api.fly.dev/api/v1") }
 
-        val scope = rememberCoroutineScope()
+    // Call API methods (all are suspend functions)
+        LaunchedEffect(Unit) {
+            // Get version
+            when (val result = apiService.getVersion()) {
+                is ApiResult.Success -> println("Version: ${result.data}")
+                is ApiResult.Error -> println("Error: ${result.message}")
+            }
+
+            // Get asset config
+            when (val result = apiService.getAssetConfigIntValue(assetId = 123)) {
+                is ApiResult.Success -> println("Success!")
+                is ApiResult.Error -> println("Error: ${result.message}")
+            }
+
+            // Post new asset config
+            val request = PostAssetIntValueRequest(assetId = 1, key = "myKey", value = 42)
+            apiService.postAssetConfigIntValue(request)
+        }
+
+
+    KoinContext {
+        // Create the multiplatform API service using Ktor
+        val httpClient = remember { createPlatformHttpClient() }
+        val apiService = remember { ApiService(httpClient, "https://poset-api.fly.dev/api/v1") }
+
+        // Example: Fetch version on launch
+        LaunchedEffect(Unit) {
+            when (val result = apiService.getVersion()) {
+                is ApiResult.Success -> println("API Version: ${result.data}")
+                is ApiResult.Error -> println("API Error: ${result.message}")
+            }
+        }
+
         val savedToken by prefs
             .data
             .map {

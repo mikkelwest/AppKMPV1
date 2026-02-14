@@ -130,7 +130,7 @@ openApiGenerate {
 
 // Add generated sources to androidMain only (since it uses OkHttp which is JVM/Android-only)
 kotlin.sourceSets.getByName("androidMain") {
-    kotlin.srcDir(layout.buildDirectory.dir("generated/openapi/src/main/kotlin"))
+    kotlin.srcDir(layout.buildDirectory.dir("generated/openapi/src/androidMain/kotlin"))
 }
 
 // Ensure generation runs before Kotlin compilation tasks
