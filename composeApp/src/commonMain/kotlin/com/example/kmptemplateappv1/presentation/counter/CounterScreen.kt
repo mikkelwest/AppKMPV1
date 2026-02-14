@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.kmptemplateappv1.data.dependencies.MyRepository
 import kotlinx.coroutines.flow.collectLatest
+import org.koin.compose.koinInject
 
 @Composable
 fun CounterScreen(
@@ -24,6 +26,8 @@ fun CounterScreen(
 ) {
     val state = vm.state.collectAsStateWithLifecycleCompat()
     val snackbarHostState = remember { SnackbarHostState() }
+    val aa = koinInject<MyRepository>()
+    val aaa = aa.helloWorld()
 
     // Collect one-off effects
     LaunchedEffect(Unit) {
@@ -60,5 +64,7 @@ fun CounterScreen(
         Button(onClick = { vm.onEvent(CounterContract.Event.ResetClicked) }) {
             Text("Reset")
         }
+        Spacer(Modifier.height(8.dp))
+        Text(text = "di: ${aa.helloWorld()}")
     }
 }
