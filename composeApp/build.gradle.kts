@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -108,34 +107,42 @@ android {
     }
 }
 
-// Configure OpenAPI Generator to produce a Kotlin client (multiplatform)
+// Configure OpenAPI Generator to produce a Kotlin client (for Android/JVM only due to OkHttp dependency)
 openApiGenerate {
-    // Use the kotlin generator (supports multiplatform option)
+    // Use the kotlin generator
     generatorName.set("kotlin")
     inputSpec.set(rootProject.file("openapi/swagger.json").absolutePath)
-    outputDir.set(file("${buildDir.path}/generated/openapi").absolutePath)
+    outputDir.set(layout.buildDirectory.dir("generated/openapi").get().asFile.absolutePath)
 
     // The Kotlin generator uses 'packageName' to set the base package
     packageName.set("com.example.kmptemplateappv1.openapi")
     apiPackage.set("com.example.kmptemplateappv1.openapi.api")
     modelPackage.set("com.example.kmptemplateappv1.openapi.model")
 
-    // Use kotlinx_serialization (correct enum value) and generate multiplatform code
+    // Use kotlinx_serialization and configure for JVM/Android usage
     configOptions.set(mapOf(
         "serializationLibrary" to "kotlinx_serialization",
         "dateLibrary" to "string",
-        "useCoroutines" to "true"
+        "useCoroutines" to "true",
+        "library" to "jvm-okhttp4"
     ))
 }
 
-// Ensure generation runs before Kotlin compilation tasks
-tasks.matching { it.name.startsWith("compileKotlin") }.configureEach {
-    dependsOn(tasks.named("openApiGenerate"))
+// Add generated sources to androidMain only (since it uses OkHttp which is JVM/Android-only)
+kotlin.sourceSets.getByName("androidMain") {
+    kotlin.srcDir(layout.buildDirectory.dir("generated/openapi/src/main/kotlin"))
 }
 
-// Explicitly ensure common metadata compilation depends on OpenAPI generation
-tasks.matching { it.name.contains("compileCommonMainKotlinMetadata") }.configureEach {
-    dependsOn(tasks.named("openApiGenerate"))
+// Ensure generation runs before Kotlin compilation tasks
+// Use afterEvaluate to safely wire up dependencies without early resolution
+afterEvaluate {
+    tasks.findByName("compileCommonMainKotlinMetadata")?.dependsOn("openApiGenerate")
+    tasks.findByName("compileKotlinAndroid")?.dependsOn("openApiGenerate")
+    tasks.findByName("compileDebugKotlinAndroid")?.dependsOn("openApiGenerate")
+    tasks.findByName("compileReleaseKotlinAndroid")?.dependsOn("openApiGenerate")
+    tasks.findByName("compileKotlinIosX64")?.dependsOn("openApiGenerate")
+    tasks.findByName("compileKotlinIosArm64")?.dependsOn("openApiGenerate")
+    tasks.findByName("compileKotlinIosSimulatorArm64")?.dependsOn("openApiGenerate")
 }
 
 dependencies {
