@@ -1,3 +1,4 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
 package com.example.kmptemplateappv1.data.networking
 
 import com.example.kmptemplateappv1.data.repository.tokenStore
@@ -10,7 +11,10 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.contextual
 
 
 fun createHttpClient(engine: HttpClientEngine): HttpClient {
@@ -20,7 +24,6 @@ fun createHttpClient(engine: HttpClientEngine): HttpClient {
         }
         install(Auth) {
             bearer {
-                // Ktor calls this from a coroutine context, so we can call suspend functions.
                 loadTokens {
                     val access = tokenStore.getAccessToken()
                     val refresh = tokenStore.getRefreshToken()
@@ -33,21 +36,13 @@ fun createHttpClient(engine: HttpClientEngine): HttpClient {
             }
         }
         install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true; isLenient = true })
-        }
-        /*
-        install(contentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
-                prettyPrint = true
                 isLenient = true
+                serializersModule = SerializersModule {
+                    contextual(Instant::class, LenientInstantSerializer)
+                }
             })
         }
-        */
-
-
-
-        // Configure your HTTP client here (e.g., timeouts, logging, etc.)
     }
 }
-
