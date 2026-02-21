@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.kmptemplateappv1.presentation.control.Control
 import com.example.kmptemplateappv1.screens.GroupList
+import com.example.kmptemplateappv1.presentation.group.GroupScreen
 import com.example.kmptemplateappv1.presentation.login.Login
 import com.example.kmptemplateappv1.presentation.login.LoginViewModel
 import com.example.kmptemplateappv1.screens.Profile
@@ -57,7 +58,11 @@ fun NavigationRoot(
 
                 is Route.ToGroupList ->
                     NavEntry(key) {
-                        GroupList()
+                        GroupScreen(
+                            prefs = prefs,
+                            onBack = { backStack.last() }
+                        )
+
                     }
 
                 is Route.ToProfile ->

@@ -15,13 +15,16 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.example.kmptemplateappv1.data.di.aacModule
+import com.example.kmptemplateappv1.data.networking.AacClient
 
-import com.example.kmptemplateappv1.data.networking.createPlatformHttpClient
+
 import com.example.kmptemplateappv1.data.networking.ApiService
 import com.example.kmptemplateappv1.data.networking.ApiResult
+import com.example.kmptemplateappv1.data.networking.createPlatformHttpClient
 import com.example.kmptemplateappv1.navigation.NavigationRoot
 import com.example.kmptemplateappv1.navigation.Route
-import com.example.kmptemplateappv1.openapi.api.AacMicroServiceBackApi
+
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.map
 import com.example.kmptemplateappv1.theme.AppTheme
@@ -29,6 +32,11 @@ import com.example.kmptemplateappv1.theme.AppTheme
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import org.koin.compose.KoinContext
+import org.koin.compose.koinInject
+import org.koin.core.component.getScopeName
+import util.onError
+import util.onSuccess
+
 
 
 data class BottomNavItem(
@@ -42,27 +50,31 @@ fun App(
     prefs: DataStore<Preferences>
 ) {
     KoinContext {
+        val client = koinInject<AacClient>()
+
+
+        var uncensoredText by remember {
+            mutableStateOf("")
+        }
+        var isLoading by remember {
+            mutableStateOf(false)
+        }
+        var errorMessage by remember {
+            mutableStateOf("")
+        }
+
+
         // Create the multiplatform API service using Ktor
+
         val httpClient = createPlatformHttpClient()
-        val api = AacMicroServiceBackApi(
-            baseUrl = "https://aac.sdlab.dk",
-            httpClient = httpClient
-        )
+
+
+
 
         // State for API response
 
         // Example: Fetch version on launch
-        LaunchedEffect(Unit) {
-            try {
-                val groups = api.groupsGroupIdGet(76)
-                val aa = groups.body()
-                println("Groups: ${groups.body().groupName}")
-                val aaa = groups.body()
 
-            } catch (e: Exception) {
-                println("Error: ${e.message}")
-            }
-        }
 
         val savedToken by prefs
             .data

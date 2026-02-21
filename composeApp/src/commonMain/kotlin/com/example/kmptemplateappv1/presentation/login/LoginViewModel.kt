@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class LoginViewModel : ViewModel() {
 
     private val client = createPlatformHttpClient()
-    private val api = SecApi(client, "https://sec.sdlab.dk")
+    private val sec = SecApi(client, "https://sec.sdlab.dk")
 
     private val _state = MutableStateFlow(LoginContract.State())
     val state: StateFlow<LoginContract.State> = _state.asStateFlow()
@@ -57,7 +57,7 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val res = api.login(current.email, current.password)
+                val res = sec.login(current.email, current.password)
                 val access = res?.access_token
                 if (!access.isNullOrBlank()) {
                     _state.update { it.copy(isLoading = false) }
