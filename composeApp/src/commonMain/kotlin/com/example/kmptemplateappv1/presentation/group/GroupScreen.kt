@@ -19,11 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -34,6 +30,20 @@ fun GroupScreen(
     prefs: DataStore<Preferences>,
 
 ) {
+
+    /*
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                GroupContract.Effect.LoadGroup -> { /* could show snackbar */ }
+
+            } else {
+            // Handle other effects if needed
+            }
+        }
+    }
+
+     */
 
     val groups by viewModel.groups.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -63,18 +73,7 @@ fun GroupScreen(
                         ( group.subGroups ) .forEach { subGroup ->
                             Button(
                                 onClick = {
-                                    scope.launch {
-                                        viewModel.loadGroups(subGroup.groupId.toInt())
-                                    }
-                                    /*
-                                    scope.launch {
-                                        prefs.edit { dataStore ->
-                                            val key = stringPreferencesKey("selected_group")
-                                            dataStore[key] = subGroup.groupId.toString()
-                                        }
-
-                                    }
-                                     */
+                                    viewModel.onEvent(GroupContract.Event.OnGroupSelected(subGroup)) {}
                             }
                                 , modifier = Modifier.padding(top = 4.dp)) {
                                 Text(subGroup.groupName ?: "Unnamed Subgroup")

@@ -6,10 +6,11 @@ import com.example.kmptemplateappv1.data.networking.AacClient
 import com.example.kmptemplateappv1.domain.model.Group
 import com.example.kmptemplateappv1.domain.model.toGroup
 import com.example.kmptemplateappv1.presentation.login.LoginContract
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import util.onError
 import util.onSuccess
@@ -20,6 +21,9 @@ class GroupViewModel(
 
     private val _groups: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
     val groups = _groups.asStateFlow()
+
+    private val _effect = Channel<LoginContract.Effect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -44,12 +48,13 @@ class GroupViewModel(
     }
 
 
-
-    suspend fun onEvent(event: GroupContract.Event) {
+    fun onEvent(event: GroupContract.Event, function: () -> Unit): Unit {
         when (event) {
             is GroupContract.Event.OnGroupSelected -> {
                 println("Selected group: ${event.group.groupName}")
-                loadGroups(event.group.groupId.toInt())
+                viewModelScope.launch {
+                    loadGroups(event.group.groupId.toInt())
+                }
             }
         }
     }

@@ -16,8 +16,7 @@ sealed interface GroupContract {
     }
 
     sealed interface Effect {
-        data object LoadGroups : Effect
-
+        //data object LoadGroups : Effect
         data class LoadGroup(val groupNumber: Int) : Effect
     }
 }
