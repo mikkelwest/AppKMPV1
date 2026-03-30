@@ -6,6 +6,7 @@ data class Group(
     val groupId: Long,
     val groupName: String? = null,
     val timeStamp: String,
+    val assetId: List<Int?> = emptyList(),
     val subGroups: List<Group> = emptyList()
 )
 
@@ -15,6 +16,7 @@ fun GroupResponse.toGroup(): Group {
         groupId = groupId,
         groupName = groupName,
         timeStamp = timeStamp,
+        assetId = assetId.map { it?.toInt() },
         subGroups = subGroups.map { it.toGroup() }
     )
 }
@@ -25,6 +27,7 @@ fun Group.toGroupResponse(): GroupResponse {
         groupId = groupId,
         groupName = groupName,
         timeStamp = timeStamp,
+        assetId = assetId.map { it?.toInt() },
         subGroups = subGroups.map { it.toGroupResponse() }
     )
 }

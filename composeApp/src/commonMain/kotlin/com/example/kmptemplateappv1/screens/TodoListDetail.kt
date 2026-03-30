@@ -34,7 +34,7 @@ fun TodoDetailScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(1.dp)
     ) {
         Text(
             text = "Back",

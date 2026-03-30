@@ -33,7 +33,7 @@ fun TodoListScreen(
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp) // leave space for bottom bar
+            contentPadding = PaddingValues(top = 1.dp, bottom = 80.dp) // leave space for bottom bar
         ) {
             items(todos) { todo ->
                 Text(
@@ -41,7 +41,7 @@ fun TodoListScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onTodoClick(todo) }
-                        .padding(16.dp)
+                        .padding(1.dp)
                 )
             }
         }
@@ -56,7 +56,7 @@ fun TodoListScreen(
                 .clickable {
                     onTodoClick("Login")
                 }
-                .padding(8.dp),
+                .padding(1.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(text = "login")

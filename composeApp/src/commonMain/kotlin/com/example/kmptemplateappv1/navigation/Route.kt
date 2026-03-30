@@ -6,11 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Route: NavKey {
 
-    @Serializable
-    data object  TodoList : Route,  NavKey
 
-    @Serializable
-    data class TodoDetails(val todo: String) : Route, NavKey
 
     @Serializable
     data object ToLogin : Route, NavKey
@@ -22,7 +18,9 @@ sealed interface Route: NavKey {
     data object ToControl : Route, NavKey
 
     @Serializable
-    data object ToGroupList : Route, NavKey
+    data class ToGroupList(val groupNr: Int) : Route, NavKey
+
+
 
     @Serializable
     data object ToCounter : Route, NavKey

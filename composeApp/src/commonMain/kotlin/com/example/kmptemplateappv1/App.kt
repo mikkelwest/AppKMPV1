@@ -1,13 +1,16 @@
 package com.example.kmptemplateappv1
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -88,28 +91,26 @@ fun App(
             configuration = SavedStateConfiguration {
                 serializersModule = SerializersModule {
                     polymorphic(NavKey::class) {
-                        subclass(Route.TodoList::class, Route.TodoList.serializer())
-                        subclass(Route.TodoDetails::class, Route.TodoDetails.serializer())
-                        subclass(Route.ToLogin::class, Route.ToLogin.serializer())
+                        subclass(Route.ToGroupList::class , Route.ToGroupList.serializer())
+
                     }
                 }
             },
-            Route.TodoList
+            Route.ToGroupList(1)  // Landing page - change this to set different starting screen
         )
 
         // Navigate to login if no token
         LaunchedEffect(savedToken) {
             if (savedToken == "No token saved") {
                 backStack.add(Route.ToLogin)
-            } else {
-                backStack.add(Route.TodoList)
             }
+            backStack.add(Route.ToGroupList(1))
         }
 
         val item = listOf(
             BottomNavItem(
                 title = "Groups",
-                route = Route.ToGroupList
+                route = Route.ToGroupList(1)
             ),
             BottomNavItem(
                 title = "Control",

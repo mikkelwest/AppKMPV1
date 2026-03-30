@@ -1,7 +1,9 @@
 package com.example.kmptemplateappv1.navigation
 
+import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -14,8 +16,6 @@ import com.example.kmptemplateappv1.presentation.group.GroupScreen
 import com.example.kmptemplateappv1.presentation.login.Login
 import com.example.kmptemplateappv1.presentation.login.LoginViewModel
 import com.example.kmptemplateappv1.screens.Profile
-import com.example.kmptemplateappv1.screens.TodoDetailScreen
-import com.example.kmptemplateappv1.screens.TodoListScreen
 import com.example.kmptemplateappv1.presentation.counter.CounterScreen
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -36,20 +36,7 @@ fun NavigationRoot(
         ),
         entryProvider = { key ->
             when (key) {
-                is Route.TodoList ->
-                    NavEntry(key) {
-                        TodoListScreen(
-                            onTodoClick = { backStack.add(Route.TodoDetails(it)) }
-                        )
-                    }
 
-                is Route.TodoDetails ->
-                    NavEntry(key) {
-                        TodoDetailScreen(
-                            todo = key.todo,
-                            onBackClick = { backStack.last() }
-                        )
-                    }
 
                 is Route.ToControl ->
                     NavEntry(key) {
@@ -60,10 +47,13 @@ fun NavigationRoot(
                     NavEntry(key) {
                         GroupScreen(
                             prefs = prefs,
-                            onBack = { backStack.last() }
+                            selectedGroup = key.groupNr,
+                            navigateToGroup = { backStack.add(Route.ToGroupList (it) ) },
+                            onBackClick = { backStack.removeLastOrNull() }
                         )
-
                     }
+
+
 
                 is Route.ToProfile ->
                     NavEntry(key) {

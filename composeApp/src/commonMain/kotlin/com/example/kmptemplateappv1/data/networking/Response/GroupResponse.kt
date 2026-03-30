@@ -7,5 +7,6 @@ data class GroupResponse(
     val groupId: Long,
     val groupName: String? = null,
     val timeStamp: String,
+    val assetId: List<Int?> = emptyList(),
     val subGroups: List<GroupResponse> = emptyList()
 )

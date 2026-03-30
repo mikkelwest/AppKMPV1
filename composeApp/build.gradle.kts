@@ -10,6 +10,8 @@ plugins {
 
 }
 
+
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -64,6 +66,9 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
            // implementation(libs.lifecycle.viewmodel)
            // implementation(libs.navigation.compose)
+            implementation("network.chaintech:cmpcharts:1.0.0")
+
+            implementation("org.jetbrains.compose.material:material-icons-extended:1.6.0")
 
 
             api(libs.datastore.preferences)

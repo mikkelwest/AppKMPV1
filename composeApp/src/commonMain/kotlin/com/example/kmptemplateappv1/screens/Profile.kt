@@ -17,12 +17,12 @@ fun Profile(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier.fillMaxSize().padding(1.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Profile")
-        Button(onClick = onBack, modifier = Modifier.padding(top = 16.dp)) {
+        Button(onClick = onBack, modifier = Modifier.padding(top = 1.dp)) {
             Text("Back")
         }
     }

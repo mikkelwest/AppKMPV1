@@ -19,7 +19,7 @@ class AacClient(private val httpClient: HttpClient) {
     suspend fun groupSlim(groupNr: Int ): Result<GroupResponse, NetworkError> {
         val response = try {
             httpClient.get(
-                urlString = "https://aac.sdlab.dk/groups/$groupNr/slim"
+                urlString = "https://aac.sdlab.dk/groups/$groupNr/full"
             ) {
                 accept(ContentType.Application.Json)
 

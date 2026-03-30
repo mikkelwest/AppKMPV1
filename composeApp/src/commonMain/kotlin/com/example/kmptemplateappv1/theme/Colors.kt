@@ -2,7 +2,7 @@ package com.example.kmptemplateappv1.theme
 
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF3F5F90)
+val primaryLight = Color(0xFF385B83)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFD5E3FF)
 val onPrimaryContainerLight = Color(0xFF254777)
@@ -29,7 +29,7 @@ val outlineVariantLight = Color(0xFFC4C6CF)
 val scrimLight = Color(0xFF000000)
 val inverseSurfaceLight = Color(0xFF2E3035)
 val inverseOnSurfaceLight = Color(0xFFF0F0F7)
-val inversePrimaryLight = Color(0xFFA8C8FF)
+val inversePrimaryLight = Color(0xFF3D3D3D)
 val surfaceDimLight = Color(0xFFD9D9E0)
 val surfaceBrightLight = Color(0xFFF9F9FF)
 val surfaceContainerLowestLight = Color(0xFFFFFFFF)
