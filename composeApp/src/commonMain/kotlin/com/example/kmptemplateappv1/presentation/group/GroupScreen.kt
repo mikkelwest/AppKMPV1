@@ -27,7 +27,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.kmptemplateappv1.presentation.login.LoginContract
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +41,7 @@ import kotlin.text.toInt
 
 @Composable
 fun GroupScreen(
-    viewModel: GroupViewModel = koinViewModel(),
+    viewModel: GroupViewModel,
     selectedGroup: Int,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,

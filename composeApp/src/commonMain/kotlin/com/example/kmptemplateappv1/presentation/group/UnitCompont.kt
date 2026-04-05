@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.kmptemplateappv1.data.networking.Response.UnitIntHistotoryResponse
 import com.example.kmptemplateappv1.domain.model.UnitConfig
-import network.chaintech.cmpcharts.common.model.Point
 
 @Composable
 fun UnitComponent(

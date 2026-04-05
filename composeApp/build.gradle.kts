@@ -28,6 +28,13 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
         }
+        iosTarget.compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    freeCompilerArgs.add("-Xklib-duplicated-unique-name-strategy=allow-first-with-warning")
+                }
+            }
+        }
     }
 
     // OpenAPI generated Kotlin (Ktor) client will be added to commonMain
@@ -51,7 +58,8 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            // Removed lifecycle-viewmodel-compose due to stableprop symbol issues on iOS
+            // api(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
 
@@ -63,12 +71,14 @@ kotlin {
 
             api(libs.koin.core)
             implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
+            // Removed koin-compose-viewmodel to avoid LocalViewModelStoreOwner stableprop symbol issues on iOS
+            // implementation(libs.koin.compose.viewmodel)
            // implementation(libs.lifecycle.viewmodel)
            // implementation(libs.navigation.compose)
-            implementation("network.chaintech:cmpcharts:1.0.0")
+            // Disabled due to Kotlin 2.2.x incompatibility - using native Canvas chart instead
+            // implementation("network.chaintech:cmpcharts:2.0.1")
 
-            implementation("org.jetbrains.compose.material:material-icons-extended:1.6.0")
+            implementation(compose.materialIconsExtended)
 
 
             api(libs.datastore.preferences)

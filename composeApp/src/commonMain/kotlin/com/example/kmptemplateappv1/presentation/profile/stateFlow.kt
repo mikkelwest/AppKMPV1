@@ -1,4 +1,4 @@
-package com.example.kmptemplateappv1.presentation.counter
+package com.example.kmptemplateappv1.presentation.profile
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State

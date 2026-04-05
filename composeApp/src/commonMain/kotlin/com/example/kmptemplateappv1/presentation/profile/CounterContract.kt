@@ -1,4 +1,4 @@
-package com.example.kmptemplateappv1.presentation.counter
+package com.example.kmptemplateappv1.presentation.profile
 
 object CounterContract {
 

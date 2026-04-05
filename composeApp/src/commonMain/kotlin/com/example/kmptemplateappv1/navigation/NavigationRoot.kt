@@ -1,9 +1,7 @@
 package com.example.kmptemplateappv1.navigation
 
-import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -11,14 +9,16 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.kmptemplateappv1.presentation.control.Control
-import com.example.kmptemplateappv1.screens.GroupList
 import com.example.kmptemplateappv1.presentation.group.GroupScreen
+import com.example.kmptemplateappv1.presentation.group.GroupViewModel
 import com.example.kmptemplateappv1.presentation.login.Login
 import com.example.kmptemplateappv1.presentation.login.LoginViewModel
 import com.example.kmptemplateappv1.screens.Profile
-import com.example.kmptemplateappv1.presentation.counter.CounterScreen
+import com.example.kmptemplateappv1.presentation.profile.CounterScreen
+import com.example.kmptemplateappv1.presentation.profile.CounterViewModel
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import org.koin.compose.koinInject
 
 @Composable
 fun NavigationRoot(
@@ -45,7 +45,9 @@ fun NavigationRoot(
 
                 is Route.ToGroupList ->
                     NavEntry(key) {
+                        val groupViewModel: GroupViewModel = koinInject()
                         GroupScreen(
+                            viewModel = groupViewModel,
                             prefs = prefs,
                             selectedGroup = key.groupNr,
                             navigateToGroup = { backStack.add(Route.ToGroupList (it) ) },
@@ -63,7 +65,8 @@ fun NavigationRoot(
                 is Route.ToCounter
                     ->
                     NavEntry(key) {
-                        CounterScreen()
+                        val counterVm: CounterViewModel = koinInject()
+                        CounterScreen(vm = counterVm)
                     }
 
                 is Route.ToLogin ->

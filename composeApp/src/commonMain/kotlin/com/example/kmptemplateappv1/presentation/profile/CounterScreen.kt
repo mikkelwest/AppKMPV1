@@ -1,4 +1,4 @@
-package com.example.kmptemplateappv1.presentation.counter
+package com.example.kmptemplateappv1.presentation.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,14 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kmptemplateappv1.data.dependencies.MyRepository
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 
 @Composable
 fun CounterScreen(
-    vm: CounterViewModel = viewModel()
+    vm: CounterViewModel
 ) {
     val state = vm.state.collectAsStateWithLifecycleCompat()
     val snackbarHostState = remember { SnackbarHostState() }

@@ -1,8 +1,7 @@
-package com.example.kmptemplateappv1.presentation.counter
+package com.example.kmptemplateappv1.presentation.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.kmptemplateappv1.data.dependencies.MyRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

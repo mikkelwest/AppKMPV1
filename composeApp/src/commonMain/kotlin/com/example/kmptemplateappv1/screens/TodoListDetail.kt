@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kmptemplateappv1.navigation.Route
 import com.example.kmptemplateappv1.viewmodels.TodoDetailViewModel
 
@@ -25,9 +24,7 @@ import com.example.kmptemplateappv1.viewmodels.TodoDetailViewModel
 fun TodoDetailScreen(
     onBackClick: () -> Unit,
     todo: String,
-    viewModel: TodoDetailViewModel = viewModel() {
-        TodoDetailViewModel(todo)
-    },
+    viewModel: TodoDetailViewModel,
     onBack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
